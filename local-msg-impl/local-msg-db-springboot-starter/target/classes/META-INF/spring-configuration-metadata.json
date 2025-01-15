@@ -1,0 +1,11 @@
+{
+  "groups": [
+    {
+      "name": "com-meoying-loaclmessage",
+      "type": "com.meoying.localmessage.configuration.localMessageProperties",
+      "sourceType": "com.meoying.localmessage.configuration.localMessageProperties"
+    }
+  ],
+  "properties": [],
+  "hints": []
+}
