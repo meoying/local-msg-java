@@ -9,7 +9,6 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 public interface LocalMessageManagerV1 {
@@ -37,24 +36,22 @@ public interface LocalMessageManagerV1 {
                          @NotNull Supplier<Pair<T, @NotNull Message>> supplier) {
         Logger logger = getLogger();
         Pair<T, Message> p = transaction.doWithTransaction(() -> {
-            AtomicReference<String> idHolder = new AtomicReference<>("");
-            CompletableFuture<Pair<T, Message>> errorProcessingMessage =
-                    CompletableFuture.supplyAsync(supplier).whenComplete((pair, throwable) -> {
-                        if (throwable == null) {
-                            Message message = pair.getRight();
-                            if (message != null) {
-                                Result<String> save = save(message);
-                                if (!save.isSuccess()) {
-                                    logger.warn("write message to db failed{}, message:{}", save.getMsg(), message);
-                                } else {
-                                    idHolder.set(save.getData());
-                                }
-                            }
-                        }
-                    });
-            Pair<T, Message> join = errorProcessingMessage.join();
-            join.getRight().setId(idHolder.get());
-            return join;
+            try {
+                Pair<T, @NotNull Message> pair = supplier.get();
+                Message message = pair.getRight();
+                if (message != null) {
+                    Result<String> save = save(message);
+                    if (!save.isSuccess()) {
+                        logger.warn("write message to db failed{}, message:{}", save.getMsg(), message);
+                    } else {
+                        message.setId(save.getData());
+                    }
+                }
+                return pair;
+            } catch (Exception e) {
+                logger.error("business process fail，not to save localmessage",e);
+                throw new RuntimeException(e);
+            }
         });
         Message right = p.getRight();
         if (right != null) {
