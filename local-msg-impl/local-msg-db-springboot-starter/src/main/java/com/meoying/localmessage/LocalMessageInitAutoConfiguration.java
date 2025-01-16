@@ -12,9 +12,11 @@ import com.meoying.localmessage.utils.SpringTransactionSupport;
 import com.meoying.localmessage.utils.TransactionHelper;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.sql.DataSource;
@@ -24,20 +26,26 @@ import javax.sql.DataSource;
 @ConditionalOnBean(DataSource.class)
 @AutoConfigureAfter({DataSourceAutoConfiguration.class, LocalMessageStarterAutoConfiguration.class})
 @ConditionalOnProperty(
-        prefix = "com.meoying.loaclmessage.base.enable",
+        prefix = "com.meoying.localmessage.base.enable",
         value = {"true"},
         matchIfMissing = true
 )
 public class LocalMessageInitAutoConfiguration {
 
+    @Bean
+    @ConditionalOnMissingBean
     public TransactionV1 transactionV1(TransactionHelper transactionHelper) {
         return new SpringTransactionSupport(transactionHelper);
     }
 
+    @Bean
+    @ConditionalOnMissingBean
     public LocalMessageRepository localMessageRepository(LocalMessageDao repository) {
         return new JpaLocalMessageRepository(repository);
     }
 
+    @Bean
+    @ConditionalOnMissingBean
     public LocalMessageManagerV1 localMessageManagerV1(LocalMessageRepository localMessageRepository,
                                                        MsgSender msgSender) {
         return new DefaultLocalMessageManager(localMessageRepository, msgSender);

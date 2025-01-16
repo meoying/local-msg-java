@@ -7,9 +7,12 @@ import com.meoying.localmessage.logging.Slf4jImpl;
 import com.meoying.localmessage.utils.TransactionHelper;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.StringUtils;
@@ -21,7 +24,7 @@ import javax.sql.DataSource;
 @ConditionalOnBean(DataSource.class)
 @AutoConfigureAfter({DataSourceAutoConfiguration.class})
 @ConditionalOnProperty(
-        prefix = "com.meoying.loaclmessage.base.enable",
+        prefix = "com.meoying.localmessage.base.enable",
         value = {"true"},
         matchIfMissing = true
 )
@@ -51,6 +54,8 @@ public class LocalMessageStarterAutoConfiguration {
         }
     }
 
+    @Bean
+    @ConditionalOnMissingBean
     public TransactionHelper transactionHelper(PlatformTransactionManager transactionManager) {
         return new TransactionHelper(transactionManager);
     }
