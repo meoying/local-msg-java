@@ -2,7 +2,7 @@ package com.meoying.localmessage.configuration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "com.meoying.loaclmessage")
+@ConfigurationProperties(prefix = "com.meoying.localmessage")
 public class localMessageProperties {
 
     private String loggerClass = "com.meoying.localmessage.logging.Slf4jLoggerImpl";
