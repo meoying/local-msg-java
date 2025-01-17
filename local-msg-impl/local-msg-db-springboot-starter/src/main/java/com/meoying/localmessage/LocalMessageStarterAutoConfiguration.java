@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -28,6 +29,7 @@ import javax.sql.DataSource;
         value = {"true"},
         matchIfMissing = true
 )
+@ComponentScan({"com.meoying.localmessage"})
 public class LocalMessageStarterAutoConfiguration {
 
     private final DataSource dataSource;

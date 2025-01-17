@@ -44,7 +44,7 @@ public class JpaLocalMessageRepository implements LocalMessageRepository {
 
     @Override
     public int updateStatusRetry(Message message, MessageStatus newStatus) {
-        return repository.updateStatusSuccess(message.id(), newStatus, Arrays.asList(MessageStatus.Init,
+        return repository.updateStatusRetry(message.id(), newStatus, Arrays.asList(MessageStatus.Init,
                 MessageStatus.RetryIng));
     }
 
