@@ -9,19 +9,19 @@ public interface Result<T> {
     String SUCCESS_CODE_PART = "1";
     String TIMEOUT_CODE = "999";
 
-    static boolean IsTimeout(Result<?> result) {
+    static boolean isTimeout(Result<?> result) {
         return TIMEOUT_CODE.equals(result.getCode());
     }
 
-    static <T> Result<T> Success(String msg, T t) {
+    static <T> Result<T> success(String msg, T t) {
         return new SuccessResult<>(msg, t);
     }
 
-    static <T> Result<T> Success(String code, String msg, T t) {
+    static <T> Result<T> success(String code, String msg, T t) {
         return new SuccessResult<>(code, msg, t);
     }
 
-    static <T> Result<T> Fail(String code, String msg) {
+    static <T> Result<T> fail(String code, String msg) {
         return new ErrorResult<>(code, msg);
     }
 

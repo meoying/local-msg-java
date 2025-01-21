@@ -6,9 +6,9 @@ public class DefaultMessage implements Message {
 
     private final String topic;
     private final String msg;
-    private String id;
+    private long id;
 
-    public DefaultMessage(String id, String msg, String topic) {
+    public DefaultMessage(Long id, String msg, String topic) {
         this(msg,topic);
         this.id = id;
     }
@@ -29,13 +29,13 @@ public class DefaultMessage implements Message {
     }
 
     @Override
-    public String id() {
+    public Long id() {
         return id;
     }
 
     @Override
-    public void setId(String id) {
-        if (this.id == null || "".equals(this.id)) {
+    public void setId(Long id) {
+        if (this.id == 0L) {
             this.id = id;
         }
     }

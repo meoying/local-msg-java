@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: test-demo
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/msg_test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: root
+    hikari:
+      maximum-pool-size: 20
+      connection-timeout: 0
+  profiles:
+    active: dev
+  jpa:
+    show-sql: true
+#    hibernate:
+#      ddl-auto : create
+    properties:
+      hibernate:
+       dialect: org.hibernate.dialect.MySQLDialect
+
+com:
+  meoying:
+    localmessage:
+        enable: true
+        type: simple

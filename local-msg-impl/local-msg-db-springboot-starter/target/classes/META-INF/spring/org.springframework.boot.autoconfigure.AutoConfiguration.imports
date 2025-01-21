@@ -1,2 +1,4 @@
 com.meoying.localmessage.LocalMessageStarterAutoConfiguration
-com.meoying.localmessage.LocalMessageInitAutoConfiguration
+com.meoying.localmessage.LocalMessageJpaAutoConfiguration
+com.meoying.localmessage.LocalMessageShardingInitAutoConfiguration
+com.meoying.localmessage.LocalMessageSimpleInitAutoConfiguration

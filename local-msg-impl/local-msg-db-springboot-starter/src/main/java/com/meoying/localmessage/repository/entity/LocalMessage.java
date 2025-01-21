@@ -1,22 +1,20 @@
 package com.meoying.localmessage.repository.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "LOCAL_MESSAGE")
 public class LocalMessage {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     @Column
     private String topic;
     @Column
     private String msg;
     @Column
-    private String status;
+    private int status;
     @Column(name = "retry_count")
     private int retryCount;
     @Column(name = "data_chg_time")
@@ -27,7 +25,7 @@ public class LocalMessage {
         return dataChgTime;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
@@ -39,7 +37,7 @@ public class LocalMessage {
         return retryCount;
     }
 
-    public String getStatus() {
+    public int getStatus() {
         return status;
     }
 
@@ -51,7 +49,7 @@ public class LocalMessage {
         this.dataChgTime = dataChgTime;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -63,7 +61,7 @@ public class LocalMessage {
         this.retryCount = retryCount;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 

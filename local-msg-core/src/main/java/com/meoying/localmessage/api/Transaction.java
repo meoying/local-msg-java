@@ -1,8 +1,8 @@
 package com.meoying.localmessage.api;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import java.util.function.Supplier;
 
 public interface Transaction {
-    Connection getConnection() throws SQLException;
+
+    <T> T doWithTransaction(Supplier<T> supplier);
 }

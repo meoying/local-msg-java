@@ -1,4 +1,4 @@
-package com.meoying.localmessage.core.utils.utils;
+package com.meoying.localmessage.core.utils;
 
 import com.meoying.localmessage.api.ShardingFunc;
 import com.meoying.localmessage.core.threadlocal.AsyncSupportThreadLocal;

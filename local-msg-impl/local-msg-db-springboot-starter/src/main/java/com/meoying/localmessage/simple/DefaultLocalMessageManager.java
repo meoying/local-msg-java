@@ -1,23 +1,25 @@
 package com.meoying.localmessage.simple;
 
-import com.meoying.localmessage.api.LocalMessageManagerV1;
+import com.meoying.localmessage.api.LocalMessageManager;
 import com.meoying.localmessage.api.Message;
 import com.meoying.localmessage.api.MessageStatus;
+import com.meoying.localmessage.api.StopFunc;
 import com.meoying.localmessage.core.Result;
-import com.meoying.localmessage.core.logging.LogFactory;
-import com.meoying.localmessage.core.logging.Logger;
+import com.meoying.localmessage.core.exception.MessageException;
+import com.meoying.localmessage.core.exception.NoSuchMessageException;
 import com.meoying.localmessage.msg.MsgSender;
 import com.meoying.localmessage.repository.LocalMessageRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 
-public class DefaultLocalMessageManager implements LocalMessageManagerV1 {
+public class DefaultLocalMessageManager implements LocalMessageManager {
 
-    private final Logger logger = LogFactory.getLogger(DefaultLocalMessageManager.class);
+    private final Logger logger = LoggerFactory.getLogger(DefaultLocalMessageManager.class);
     private final LocalMessageRepository localMessageRepository;
     private final MsgSender msgSender;
 
@@ -27,52 +29,52 @@ public class DefaultLocalMessageManager implements LocalMessageManagerV1 {
     }
 
     @Override
-    public Result<?> send(Message message) {
+    public void send(Message message) throws MessageException {
         try {
-            Message localMessage = localMessageRepository.find(message.id(), MessageStatus.Init,
-                    MessageStatus.RetryIng);
+            Message localMessage = localMessageRepository.find(message.id(), MessageStatus.Init);
             if (localMessage == null) {
-                return Result.Fail("-1", "消息不存在");
+                throw new NoSuchMessageException("can't find current message in storage");
             }
             Result<?> send = msgSender.send(message.topic(), message.msg());
-            //todo
+
             if (send.isSuccess()) {
                 if (localMessageRepository.updateStatusSuccess(message, MessageStatus.Success) == 0) {
-                    return Result.Success("发送成功，更新失败", null);
+                    logger.warn("update message sending Success result fail");
                 }
-                return Result.Success("发送成功", null);
             } else {
-                if (localMessageRepository.updateStatusRetry(message, MessageStatus.RetryIng) == 0) {
-                    logger.warn("更新失败...");
+                if (localMessageRepository.updateRetryCount(message, MessageStatus.Init) == 0) {
+                    logger.warn("update message sending Init result fail");
                 }
             }
-            return send;
         } catch (Exception e) {
-            return Result.Fail("-1", "发送失败:" + e.getMessage());
+            throw new MessageException("unknown error : ", e);
         }
     }
 
     @Override
-    public Result<String> save(Message message) {
+    public Long save(Message message) throws MessageException {
         try {
             return localMessageRepository.save(message);
         } catch (Exception e) {
-            return Result.Fail("-1", "保存失败:" + e.getMessage());
+            throw new MessageException("unknown error : ", e);
         }
     }
 
     @Override
-    public Result<AtomicBoolean> fixMessage() {
-        AtomicBoolean atomicBoolean = new AtomicBoolean(true);
+    public StopFunc fixMessage() {
+        StopFunc stopFunc = new StopFunc();
         CompletableFuture.runAsync(() -> {
             int pageSize = 100;
             int pageNum = 0;
             int maxRetryCount = 3;
-            while (atomicBoolean.get()) {
-                List<Message> messageList = localMessageRepository.findMessageByPageSize(pageSize, pageNum, maxRetryCount);
+
+            while (stopFunc.isDone()) {
+                long delayTimeStamp = System.currentTimeMillis() - 5000;
+                List<Message> messageList = localMessageRepository.findMessageByPageSize(pageSize, pageNum,
+                        maxRetryCount, delayTimeStamp);
                 if (messageList.isEmpty()) {
                     try {
-                        TimeUnit.SECONDS.sleep(10);
+                        TimeUnit.SECONDS.sleep(2);
                     } catch (InterruptedException ignore) {
                         logger.error(ignore.getMessage());
                     }
@@ -81,19 +83,21 @@ public class DefaultLocalMessageManager implements LocalMessageManagerV1 {
                 }
 
                 for (Message message : messageList) {
-                    if (!atomicBoolean.get()) {
+                    if (!stopFunc.isDone()) {
                         logger.info("任务退出");
                         return;
                     }
-                    Result<?> send = this.send(message);
-                    if (!send.isSuccess()) {
-                        logger.warn("消息发送失败，{}", send.getMsg());
+                    try {
+                        send(message);
+                    } catch (MessageException e) {
+                        logger.warn("send message failed{}, message:{}", e.getMessage(), message, e);
                     }
+
                 }
                 pageNum++;
             }
         });
-        return Result.Success("启动成功", atomicBoolean);
+        return stopFunc;
     }
 
 

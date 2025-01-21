@@ -1,7 +1,6 @@
 package com.meoying.localmessage.utils;
 
 import com.meoying.localmessage.core.cache.Cache;
-import com.meoying.localmessage.core.cache.memory.GuavaCache;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
@@ -13,23 +12,21 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class TransactionHelper extends TransactionTemplate {
 
-    public TransactionHelper(PlatformTransactionManager transactionManager) {
+    private final Cache<TransactionDefinition, TransactionTemplate> cache;
+
+    public TransactionHelper(Cache<TransactionDefinition, TransactionTemplate> cache,
+                             PlatformTransactionManager transactionManager) {
         super(transactionManager);
+        this.cache = cache;
     }
 
     private TransactionTemplate getTemplateInternal(TransactionDefinition definition) {
-
-        Cache<TransactionDefinition, TransactionTemplate> build =
-                new GuavaCache.GuavaCacheBuilder<TransactionDefinition, TransactionTemplate>().expireAfterWrite(3L,
-                        TimeUnit.DAYS).build();
-
-        return build.get(definition,
+        return cache.get(definition,
                 () -> new TransactionTemplate(Objects.requireNonNull(this.getTransactionManager()), definition));
     }
 

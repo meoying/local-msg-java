@@ -2,16 +2,17 @@ package com.meoying.localmessage.configuration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.List;
+import java.util.Map;
+
 @ConfigurationProperties(prefix = "com.meoying.localmessage")
 public class localMessageProperties {
 
-    private String loggerClass = "com.meoying.localmessage.logging.Slf4jLoggerImpl";
+    private Boolean enable= false;
+    private String type= "simple";
 
-    private String defaultDataSourceName ="defaultDataSource";
-
-    public String getLoggerClass() {
-        return loggerClass;
-    }
+    private String defaultDataSourceName = "defaultDataSource";
+    private Map<String, List<String>> tableNameMap;
 
     public String getDefaultDataSourceName() {
         return defaultDataSourceName;
@@ -21,7 +22,27 @@ public class localMessageProperties {
         this.defaultDataSourceName = defaultDataSourceName;
     }
 
-    public void setLoggerClass(String loggerClass) {
-        this.loggerClass = loggerClass;
+    public Boolean getEnable() {
+        return enable;
+    }
+
+    public void setEnable(Boolean enable) {
+        this.enable = enable;
+    }
+
+    public Map<String, List<String>> getTableNameMap() {
+        return tableNameMap;
+    }
+
+    public void setTableNameMap(Map<String, List<String>> tableNameMap) {
+        this.tableNameMap = tableNameMap;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

@@ -3,7 +3,6 @@ package com.meoying.localmessage.api;
 public enum MessageStatus {
 
     Init(0),
-    RetryIng(1),
     Success(2),
     Fail(3);
 

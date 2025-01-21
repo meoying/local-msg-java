@@ -1,11 +1,32 @@
 {
   "groups": [
     {
-      "name": "com-meoying-loaclmessage",
+      "name": "com.meoying.localmessage",
       "type": "com.meoying.localmessage.configuration.localMessageProperties",
       "sourceType": "com.meoying.localmessage.configuration.localMessageProperties"
     }
   ],
-  "properties": [],
+  "properties": [
+    {
+      "name": "com.meoying.localmessage.default-data-source-name",
+      "type": "java.lang.String",
+      "sourceType": "com.meoying.localmessage.configuration.localMessageProperties"
+    },
+    {
+      "name": "com.meoying.localmessage.enable",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.meoying.localmessage.configuration.localMessageProperties"
+    },
+    {
+      "name": "com.meoying.localmessage.table-name-map",
+      "type": "java.util.Map<java.lang.String,java.util.List<java.lang.String>>",
+      "sourceType": "com.meoying.localmessage.configuration.localMessageProperties"
+    },
+    {
+      "name": "com.meoying.localmessage.type",
+      "type": "java.lang.String",
+      "sourceType": "com.meoying.localmessage.configuration.localMessageProperties"
+    }
+  ],
   "hints": []
 }

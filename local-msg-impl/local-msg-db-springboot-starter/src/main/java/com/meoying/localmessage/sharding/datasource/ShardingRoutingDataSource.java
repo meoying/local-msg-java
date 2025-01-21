@@ -1,21 +1,25 @@
 package com.meoying.localmessage.sharding.datasource;
 
-import com.meoying.localmessage.core.logging.LogFactory;
-import com.meoying.localmessage.core.logging.Logger;
-import com.meoying.localmessage.core.utils.utils.ShardingFuncThreadLocal;
+import com.meoying.localmessage.core.utils.ShardingFuncThreadLocal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import org.springframework.util.CollectionUtils;
 
 import javax.sql.DataSource;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 public class ShardingRoutingDataSource extends AbstractRoutingDataSource {
 
-    private final Logger logger=LogFactory.getLogger(ShardingRoutingDataSource.class);
+    private final Logger logger=LoggerFactory.getLogger(ShardingRoutingDataSource.class);
 
-    public ShardingRoutingDataSource(DataSource defaultDatasource, Map<Object, Object> targetDataSources) {
+    private final Set<String> dbName;
+
+    public ShardingRoutingDataSource(DataSource defaultDatasource, Map<Object, Object> targetDataSources, Set<String> dbName) {
         super();
+        this.dbName = dbName;
 
         if(Objects.isNull(defaultDatasource)){
             throw new IllegalArgumentException("defaultDatasource can not be null");

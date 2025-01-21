@@ -1,14 +1,14 @@
 package com.meoying.localmessage.core.utils;
 
-import com.meoying.localmessage.core.logging.LogFactory;
-import com.meoying.localmessage.core.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.*;
 import java.util.function.Supplier;
 
 public class TimeoutHandler implements AutoCloseable {
 
-    private Logger logger = LogFactory.getLogger(TimeoutHandler.class);
+    private Logger logger = LoggerFactory.getLogger(TimeoutHandler.class);
     private ScheduledExecutorService scheduler;
     private int i = 0;
 

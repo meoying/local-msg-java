@@ -2,14 +2,17 @@ package com.meoying.localmessage.repository.impl.jpa;
 
 import com.meoying.localmessage.api.Message;
 import com.meoying.localmessage.api.MessageStatus;
-import com.meoying.localmessage.core.Result;
 import com.meoying.localmessage.domain.DefaultMessage;
 import com.meoying.localmessage.repository.LocalMessageRepository;
 import com.meoying.localmessage.repository.entity.LocalMessage;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -24,35 +27,42 @@ public class JpaLocalMessageRepository implements LocalMessageRepository {
     }
 
     @Override
-    public Message find(String id, MessageStatus... messageStatuses) {
-        List<MessageStatus> statusList = Arrays.asList(messageStatuses);
+    public Message find(Long id, MessageStatus... messageStatuses) {
+        List<Integer> statusList = Arrays.stream(messageStatuses)
+                .map(MessageStatus::getCode)
+                .collect(Collectors.toList());
         LocalMessage localMessage = repository.find(id, statusList);
         return convert(localMessage);
     }
 
     @Override
-    public Result<String> save(Message message) {
-        LocalMessage save = repository.save(convert(message));
-        return Result.Success("保存成功", save.getId());
+    public Long save(Message message) {
+        LocalMessage convert = convert(message);
+        convert.setDataChgTime(System.currentTimeMillis());
+        convert.setStatus(MessageStatus.Init.getCode());
+        convert.setRetryCount(0);
+        LocalMessage save = repository.save(convert);
+
+        return save.getId();
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public int updateStatusSuccess(Message message, MessageStatus newStatus) {
-        return repository.updateStatusSuccess(message.id(), newStatus, Arrays.asList(MessageStatus.Init,
-                MessageStatus.RetryIng));
+        return repository.updateStatusSuccess(message.id(), newStatus.getCode(), MessageStatus.Init.getCode());
     }
 
     @Override
-    public int updateStatusRetry(Message message, MessageStatus newStatus) {
-        return repository.updateStatusRetry(message.id(), newStatus, Arrays.asList(MessageStatus.Init,
-                MessageStatus.RetryIng));
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public int updateRetryCount(Message message, MessageStatus newStatus) {
+        return repository.updateRetryCount(message.id(),MessageStatus.Init.getCode());
     }
 
     @Override
-    public List<Message> findMessageByPageSize(int pageSize, int pageNum, int maxRetryCount) {
+    public List<Message> findMessageByPageSize(int pageSize, int pageNum, int maxRetryCount ,Long delayTimeStamp) {
         Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by("dataChgTime").descending());
-        List<LocalMessage> messageByPageSize = repository.findMessageByPageSize(pageSize, pageNum, maxRetryCount,
-                pageable);
+        Page<LocalMessage> messageByPageSize = repository.findMessageByPageSize(maxRetryCount,
+              new Timestamp(delayTimeStamp),  pageable);
         if (messageByPageSize != null && !messageByPageSize.isEmpty()) {
             return messageByPageSize.stream().map(this::convert).collect(Collectors.toList());
         }
@@ -60,12 +70,16 @@ public class JpaLocalMessageRepository implements LocalMessageRepository {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public int failLocalMessage(int maxRetryCount) {
         return repository.failLocalMessage(maxRetryCount);
     }
 
 
     private Message convert(LocalMessage localMessage) {
+        if(localMessage==null){
+            return null;
+        }
         return new DefaultMessage(localMessage.getId(), localMessage.getMsg(), localMessage.getTopic());
     }
 
