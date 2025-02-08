@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: test-demo
+  profiles:
+    active: dev
+  jpa:
+    show-sql: true
+    #    hibernate:
+    #      ddl-auto : create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+datasource:
+  ds1:
+    pool-name: ds1
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    jdbc-url: jdbc:mysql://127.0.0.1:3306/msg_test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: root
+
+  ds2:
+    pool-name: ds2
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    jdbc-url: jdbc:mysql://127.0.0.1:3307/msg_test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: root
+
+logging:
+  level:
+    root: INFO
+    com.meoying: DEBUG
+
+com:
+  meoying:
+    localmessage:
+      enable: true
+      type: sharding
+      defaultDataSourceName: ds1
+      defaultTableName: local_message
+      tableNameMap:
+        ds1: local_message,local_message2
+        ds2: local_message,local_message2
+
+

@@ -9,7 +9,8 @@
     <version>0.0.1</version>
     <packaging>pom</packaging>
     <modules>
-        <module>local-msg-simple-db-test</module>
+        <module>local-msg-simple-db-test-v4</module>
+        <module>local-msg-sharding-db-test-v4</module>
     </modules>
 
     <properties>

@@ -1,5 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.meoying.localmessage.LocalMessageStarterAutoConfiguration,\
-com.meoying.localmessage.LocalMessageJpaAutoConfiguration,\
-com.meoying.localmessage.LocalMessageShardingInitAutoConfiguration,\
-com.meoying.localmessage.LocalMessageSimpleInitAutoConfiguration
