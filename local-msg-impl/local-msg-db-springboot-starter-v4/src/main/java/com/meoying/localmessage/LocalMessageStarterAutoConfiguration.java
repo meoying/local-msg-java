@@ -29,9 +29,8 @@ import java.util.concurrent.TimeUnit;
 @AutoConfigureAfter({DataSourceAutoConfiguration.class})
 @ConditionalOnProperty(
         prefix = "com.meoying.localmessage",
-        name = "enable", havingValue = "true"
+        name = "enable", havingValue = "true", matchIfMissing = true
 )
-//@EnableCaching
 public class LocalMessageStarterAutoConfiguration {
 
     public final static String DEFAULT_CACHE_NAME = "localMessageCache";
@@ -39,11 +38,11 @@ public class LocalMessageStarterAutoConfiguration {
     @Bean("defaultCacheManager")
     @ConditionalOnMissingBean
     public CaffeineCacheManager defaultCacheManager() {
-        CaffeineCacheManager defaultCacheManager = new CaffeineCacheManager(DEFAULT_CACHE_NAME); //指定这个缓存的命名，这里我是使用了一个常量类
+        CaffeineCacheManager defaultCacheManager = new CaffeineCacheManager(DEFAULT_CACHE_NAME);
         defaultCacheManager.setAllowNullValues(true);
         Caffeine<Object, Object> caffeineBuilder = Caffeine.newBuilder()
                 .initialCapacity(64)
-                .maximumSize(512) //从配置文件中获取最大容量
+                .maximumSize(512)
                 .expireAfterWrite(12, TimeUnit.HOURS); //过期时间
         defaultCacheManager.setCaffeine(caffeineBuilder);
         return defaultCacheManager;
@@ -59,7 +58,7 @@ public class LocalMessageStarterAutoConfiguration {
     @ConditionalOnMissingBean
     public TransactionHelper transactionHelper(@Qualifier("defaultCacheManager") CacheManager cacheManager,
                                                PlatformTransactionManager transactionManager) {
-        Cache cache =cacheManager.getCache(DEFAULT_CACHE_NAME);
+        Cache cache = cacheManager.getCache(DEFAULT_CACHE_NAME);
         return new TransactionHelper(cache, transactionManager);
     }
 }

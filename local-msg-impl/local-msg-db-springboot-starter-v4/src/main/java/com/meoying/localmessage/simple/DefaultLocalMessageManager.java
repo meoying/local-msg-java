@@ -70,11 +70,11 @@ public class DefaultLocalMessageManager implements LocalMessageManager {
             int pageSize = 100;
             int pageNum = 0;
             int maxRetryCount = 3;
-
+            long delayTimeStamp = System.currentTimeMillis() - 5000;
             int errCount = 0;
             while (!stopFunc.isDone()) {
                 try {
-                    long delayTimeStamp = System.currentTimeMillis() - 5000;
+
                     List<Message> messageList = localMessageRepository.findMessageByPageSize(pageSize, pageNum,
                             maxRetryCount, delayTimeStamp);
                     if (messageList.isEmpty()) {
@@ -84,6 +84,9 @@ public class DefaultLocalMessageManager implements LocalMessageManager {
                             logger.error(ignore.getMessage());
                         }
                         localMessageRepository.failLocalMessage(maxRetryCount);
+                        delayTimeStamp = System.currentTimeMillis() - 5000L;
+                        pageNum = 0;
+                        errCount = 0;
                         continue;
                     }
 
@@ -106,6 +109,10 @@ public class DefaultLocalMessageManager implements LocalMessageManager {
                             logger.error(ignore.getMessage());
                         }
                         localMessageRepository.failLocalMessage(maxRetryCount);
+                        delayTimeStamp = System.currentTimeMillis() - 5000L;
+                        pageNum = 0;
+                        errCount = 0;
+                        continue;
                     }
                     pageNum++;
                     errCount = 0;

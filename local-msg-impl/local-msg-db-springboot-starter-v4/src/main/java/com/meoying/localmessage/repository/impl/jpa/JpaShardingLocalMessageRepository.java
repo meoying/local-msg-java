@@ -6,7 +6,6 @@ import com.meoying.localmessage.repository.entity.LocalMessage;
 import com.meoying.localmessage.v4.api.Message;
 import com.meoying.localmessage.v4.api.MessageStatus;
 import com.meoying.localmessage.v4.api.sharding.ShardingFuncThreadLocal;
-import com.meoying.localmessage.v4.core.exception.NoSuchRoutingTableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -16,8 +15,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,18 +25,10 @@ public class JpaShardingLocalMessageRepository implements LocalMessageRepository
     private final ShardingLocalMessageDaoCustom repository;
     private final LocalMessageProperties localMessageProperties;
 
-    public JpaShardingLocalMessageRepository(ShardingLocalMessageDaoCustom repository, LocalMessageProperties localMessageProperties) {
+    public JpaShardingLocalMessageRepository(ShardingLocalMessageDaoCustom repository,
+                                             LocalMessageProperties localMessageProperties) {
         this.repository = repository;
         this.localMessageProperties = localMessageProperties;
-    }
-
-    @Override
-    public Message find(Long id, MessageStatus... messageStatuses) {
-        List<Integer> statusList = Arrays.stream(messageStatuses)
-                .map(MessageStatus::getCode)
-                .collect(Collectors.toList());
-        LocalMessage localMessage = repository.find(getTableName(), id, statusList);
-        return convert(localMessage);
     }
 
     @Override
@@ -62,12 +51,12 @@ public class JpaShardingLocalMessageRepository implements LocalMessageRepository
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public int updateRetryCount(Message message, MessageStatus newStatus) {
-        return repository.updateRetryCount(getTableName(), message.id(), MessageStatus.Init.getCode());
+        return repository.updateRetryCount(getTableName(), message.id(), newStatus.getCode());
     }
 
     @Override
     public List<Message> findMessageByPageSize(int pageSize, int pageNum, int maxRetryCount, Long delayTimeStamp) {
-        Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by("dataChgTime").descending());
+        Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by("dataChgTime").ascending());
         Page<LocalMessage> messageByPageSize = repository.findMessageByPageSize(getTableName(), maxRetryCount,
                 delayTimeStamp, pageable);
         if (messageByPageSize != null && !messageByPageSize.isEmpty()) {

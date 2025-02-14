@@ -68,7 +68,7 @@ public class DemoTestV4 {
             TbBiz entity = new TbBiz();
             entity.setBiz("saasasda");
             tbBizRepository.save(entity);
-            return () -> new Message("topic","saasasda");
+            return () -> new Message("topic", "saasasda");
         });
 
         try {
@@ -91,7 +91,6 @@ public class DemoTestV4 {
     }
 
 
-
     @Test
     public void testBiz3() {
 
@@ -99,8 +98,8 @@ public class DemoTestV4 {
             TbBiz entity = new TbBiz();
             entity.setBiz("saasasda");
             tbBizRepository.save(entity);
-            int i=1/0;
-            return () -> new Message("topic","saasasda");
+            int i = 1 / 0;
+            return () -> new Message("topic", "saasasda");
         });
 
         try {

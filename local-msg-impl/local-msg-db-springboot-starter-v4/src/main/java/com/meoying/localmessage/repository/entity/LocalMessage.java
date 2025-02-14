@@ -24,44 +24,44 @@ public class LocalMessage {
         return dataChgTime;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public int getRetryCount() {
-        return retryCount;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public String getTopic() {
-        return topic;
-    }
-
     public void setDataChgTime(long dataChgTime) {
         this.dataChgTime = dataChgTime;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public void setId(Long id) {
         this.id = id;
     }
 
+    public String getMsg() {
+        return msg;
+    }
+
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+
+    public int getRetryCount() {
+        return retryCount;
     }
 
     public void setRetryCount(int retryCount) {
         this.retryCount = retryCount;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public String getTopic() {
+        return topic;
     }
 
     public void setTopic(String topic) {

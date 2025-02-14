@@ -25,20 +25,21 @@ public interface LocalMessageDao extends JpaRepository<LocalMessage, Long> {
             "m" + ".status = :oldStatuses")
     @Modifying
     int updateStatusSuccess(@Param("id") long id, @Param("newStatus") int newStatus,
-                            @Param("oldStatuses") int oldStatus,@Param("dataChgTime") long dataChgTime);
+                            @Param("oldStatuses") int oldStatus, @Param("dataChgTime") long dataChgTime);
 
     @Query("UPDATE LocalMessage m SET m.retryCount = m.retryCount + 1, m.dataChgTime = :dataChgTime WHERE m.id " +
             "=" + " :id AND m.status = :status")
     @Modifying
-    int updateRetryCount(@Param("id") long id, @Param("status") int status,@Param("dataChgTime") long dataChgTime);
+    int updateRetryCount(@Param("id") long id, @Param("status") int status, @Param("dataChgTime") long dataChgTime);
 
-    @Query("SELECT m FROM LocalMessage m WHERE m.retryCount <= :maxRetryCount AND m.dataChgTime < :dataChgTime ORDER " +
+    @Query("SELECT m FROM LocalMessage m WHERE m.status=0 and m.retryCount <= :maxRetryCount AND m.dataChgTime < " +
+            ":dataChgTime ORDER " +
             "BY" + " m.dataChgTime ASC")
     Page<LocalMessage> findMessageByPageSize(@Param("maxRetryCount") int maxRetryCount,
                                              @Param("dataChgTime") long dataChgTime, Pageable pageable);
 
-    @Query("UPDATE LocalMessage m SET m.status = '3', m.dataChgTime = :dataChgTime WHERE m.retryCount > " +
-            ":maxRetryCount and m.status != 1")
+    @Query("UPDATE LocalMessage m SET m.status = 3, m.dataChgTime = :dataChgTime WHERE m.retryCount > " +
+            ":maxRetryCount and m.status != 2")
     @Modifying
-    int failLocalMessage(@Param("maxRetryCount") int maxRetryCount,@Param("dataChgTime") long dataChgTime);
+    int failLocalMessage(@Param("maxRetryCount") int maxRetryCount, @Param("dataChgTime") long dataChgTime);
 }

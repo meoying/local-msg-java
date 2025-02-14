@@ -8,7 +8,7 @@ public class Message {
     private long id;
 
     public Message(Long id, String topic, String msg) {
-        this(topic,msg);
+        this(topic, msg);
         this.id = id;
     }
 

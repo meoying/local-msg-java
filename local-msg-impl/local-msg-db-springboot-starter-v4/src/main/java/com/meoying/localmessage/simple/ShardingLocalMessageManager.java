@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
 
 
 public class ShardingLocalMessageManager extends DefaultLocalMessageManager {
@@ -43,9 +42,10 @@ public class ShardingLocalMessageManager extends DefaultLocalMessageManager {
         tableNameMap.forEach((k, v) -> count.addAndGet(v.size()));
 
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(1);
+        executor.setCorePoolSize(count.get());
         executor.setMaxPoolSize(count.get());
         executor.setQueueCapacity(10);
+        executor.setKeepAliveSeconds(10);
         executor.setThreadNamePrefix(getClass() + "td-");
         executor.initialize();
 
@@ -73,10 +73,11 @@ public class ShardingLocalMessageManager extends DefaultLocalMessageManager {
                         int pageNum = 0;
                         int maxRetryCount = 3;
                         int errCount = 0;
+                        long delayTimeStamp = System.currentTimeMillis() - 5000L;
                         while (!stopFunc.isDone()) {
                             try {
-
-                                long delayTimeStamp = System.currentTimeMillis() - 5000;
+                                //1739516603044
+                                //1739521484459
                                 List<Message> messageList = localMessageRepository.findMessageByPageSize(pageSize,
                                         pageNum,
                                         maxRetryCount, delayTimeStamp);
@@ -87,6 +88,9 @@ public class ShardingLocalMessageManager extends DefaultLocalMessageManager {
                                         logger.error(ignore.getMessage());
                                     }
                                     localMessageRepository.failLocalMessage(maxRetryCount);
+                                    delayTimeStamp = System.currentTimeMillis() - 5000L;
+                                    pageNum = 0;
+                                    errCount = 0;
                                     continue;
                                 }
                                 for (Message message : messageList) {
@@ -107,6 +111,9 @@ public class ShardingLocalMessageManager extends DefaultLocalMessageManager {
                                         logger.error(ignore.getMessage());
                                     }
                                     localMessageRepository.failLocalMessage(maxRetryCount);
+                                    delayTimeStamp = System.currentTimeMillis() - 5000L;
+                                    pageNum = 0;
+                                    errCount = 0;
                                 }
                                 pageNum++;
                                 errCount = 0;
@@ -117,7 +124,6 @@ public class ShardingLocalMessageManager extends DefaultLocalMessageManager {
                                     throw e;
                                 }
                             }
-
                         }
                     } catch (Exception e) {
                         logger.error(e.getMessage(), e);

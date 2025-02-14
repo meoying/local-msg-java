@@ -11,8 +11,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,15 +21,6 @@ public class JpaLocalMessageRepository implements LocalMessageRepository {
 
     public JpaLocalMessageRepository(LocalMessageDao repository) {
         this.repository = repository;
-    }
-
-    @Override
-    public Message find(Long id, MessageStatus... messageStatuses) {
-        List<Integer> statusList = Arrays.stream(messageStatuses)
-                .map(MessageStatus::getCode)
-                .collect(Collectors.toList());
-        LocalMessage localMessage = repository.find(id, statusList);
-        return convert(localMessage);
     }
 
     @Override
@@ -62,7 +51,7 @@ public class JpaLocalMessageRepository implements LocalMessageRepository {
     public List<Message> findMessageByPageSize(int pageSize, int pageNum, int maxRetryCount, Long delayTimeStamp) {
         Pageable pageable = PageRequest.of(pageNum, pageSize, Sort.by("dataChgTime").descending());
         Page<LocalMessage> messageByPageSize = repository.findMessageByPageSize(maxRetryCount,
-               delayTimeStamp, pageable);
+                delayTimeStamp, pageable);
         if (messageByPageSize != null && !messageByPageSize.isEmpty()) {
             return messageByPageSize.stream().map(this::convert).collect(Collectors.toList());
         }

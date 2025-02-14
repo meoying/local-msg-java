@@ -14,19 +14,20 @@ import java.util.Set;
 
 public class ShardingRoutingDataSource extends AbstractRoutingDataSource {
 
-    private final Logger logger=LoggerFactory.getLogger(ShardingRoutingDataSource.class);
+    private final Logger logger = LoggerFactory.getLogger(ShardingRoutingDataSource.class);
 
     private final Set<String> dbName;
 
-    public ShardingRoutingDataSource(DataSource defaultDatasource, Map<Object, Object> targetDataSources, Set<String> dbName) {
+    public ShardingRoutingDataSource(DataSource defaultDatasource, Map<Object, Object> targetDataSources,
+                                     Set<String> dbName) {
         super();
         this.dbName = dbName;
 
-        if(Objects.isNull(defaultDatasource)){
+        if (Objects.isNull(defaultDatasource)) {
             throw new IllegalArgumentException("defaultDatasource can not be null");
         }
 
-        if(CollectionUtils.isEmpty(targetDataSources)){
+        if (CollectionUtils.isEmpty(targetDataSources)) {
             throw new IllegalArgumentException("targetDataSources can not be null");
 
         }
@@ -47,11 +48,11 @@ public class ShardingRoutingDataSource extends AbstractRoutingDataSource {
     protected Object determineCurrentLookupKey() {
         try {
             ShardingFunc shardingFunc = ShardingFuncThreadLocal.get();
-            if(Objects.isNull(shardingFunc)){
+            if (Objects.isNull(shardingFunc)) {
                 return null;
             }
             return shardingFunc.getSharding().getDbName();
-        }catch (Exception e){
+        } catch (Exception e) {
             return null;
         }
     }

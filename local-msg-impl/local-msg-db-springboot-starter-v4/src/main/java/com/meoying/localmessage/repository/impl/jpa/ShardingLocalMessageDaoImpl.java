@@ -25,15 +25,6 @@ public class ShardingLocalMessageDaoImpl implements ShardingLocalMessageDaoCusto
     }
 
     @Override
-    public LocalMessage find(String tableName, long id, List<Integer> messageStatuses) {
-        String sql = "SELECT * FROM " + tableName + " WHERE id = :id AND status IN :statuses";
-        Query query = entityManager.createNativeQuery(sql, LocalMessage.class);
-        query.setParameter("id", id);
-        query.setParameter("statuses", messageStatuses);
-        return (LocalMessage) query.getSingleResult();
-    }
-
-    @Override
     public int updateStatusSuccess(String tableName, long id, int newStatus, int oldStatus) {
         String sql = "UPDATE " + tableName + " SET status = :newStatus, data_chg_time = :timestamp WHERE id = " +
                 ":id AND status = :oldStatus";
@@ -61,12 +52,13 @@ public class ShardingLocalMessageDaoImpl implements ShardingLocalMessageDaoCusto
     @Override
     public Page<LocalMessage> findMessageByPageSize(String tableName, int maxRetryCount, long timestamp,
                                                     Pageable pageable) {
-        String sql = "SELECT * FROM " + tableName + " WHERE retry_count <= :maxRetryCount AND data_chg_time < " +
+        String sql = "SELECT * FROM " + tableName + " WHERE status=0 AND retry_count <= :maxRetryCount AND " +
+                "data_chg_time < " +
                 ":timestamp order by data_chg_time ";
         Query query = entityManager.createNativeQuery(sql, LocalMessage.class);
         query.setParameter("maxRetryCount", maxRetryCount);
         query.setParameter("timestamp", timestamp);
-        log.info(pageable.toString());
+        //log.info(pageable.toString());
         query.setFirstResult((int) pageable.getOffset());
         query.setMaxResults(pageable.getPageSize());
         List<LocalMessage> resultList = query.getResultList();
@@ -75,8 +67,8 @@ public class ShardingLocalMessageDaoImpl implements ShardingLocalMessageDaoCusto
 
     @Override
     public int failLocalMessage(String tableName, int maxRetryCount) {
-        String sql = "UPDATE " + tableName + " SET status = '3', data_chg_time = :timestamp  WHERE retry_count " +
-                "> :maxRetryCount AND status != 1";
+        String sql = "UPDATE " + tableName + " SET status = 3, data_chg_time = :timestamp  WHERE retry_count " +
+                "> :maxRetryCount AND status = 0";
         Query query = entityManager.createNativeQuery(sql);
         query.setParameter("maxRetryCount", maxRetryCount);
         long timestamp = System.currentTimeMillis();

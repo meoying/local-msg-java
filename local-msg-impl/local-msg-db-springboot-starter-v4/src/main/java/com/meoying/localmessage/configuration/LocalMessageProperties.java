@@ -8,8 +8,8 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "com.meoying.localmessage")
 public class LocalMessageProperties {
 
-    private Boolean enable= false;
-    private String type= "simple";
+    private Boolean enable = false;
+    private String type = "simple";
 
     private String defaultDataSourceName = "defaultDataSource";
     private String defaultTableName = "local_message";

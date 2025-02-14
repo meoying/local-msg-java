@@ -11,11 +11,11 @@ spring:
       connection-timeout: 0
   jpa:
     show-sql: true
-#    hibernate:
-#      ddl-auto : create
+    #    hibernate:
+    #      ddl-auto : create
     properties:
       hibernate:
-       dialect: org.hibernate.dialect.MySQLDialect
+        dialect: org.hibernate.dialect.MySQLDialect
   profiles:
     active: dev
 logging:
@@ -26,6 +26,6 @@ logging:
 com:
   meoying:
     localmessage:
-        enable: true
-        type: simple
+      enable: true
+      type: simple
 

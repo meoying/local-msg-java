@@ -12,10 +12,6 @@ public enum MessageStatus {
         this.code = i;
     }
 
-    public int getCode() {
-        return code;
-    }
-
     public static MessageStatus valueOf(int i) {
         MessageStatus[] values = values();
         for (MessageStatus value : values) {
@@ -24,5 +20,9 @@ public enum MessageStatus {
             }
         }
         return null;
+    }
+
+    public int getCode() {
+        return code;
     }
 }

@@ -47,13 +47,22 @@ public class SnowflakeIdGenerator {
     // 构造函数
     public SnowflakeIdGenerator(long workerId, long datacenterId) {
         if (workerId > maxWorkerId || workerId < 0) {
-            throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", maxWorkerId));
+            throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0",
+                    maxWorkerId));
         }
         if (datacenterId > maxDatacenterId || datacenterId < 0) {
-            throw new IllegalArgumentException(String.format("datacenter Id can't be greater than %d or less than 0", maxDatacenterId));
+            throw new IllegalArgumentException(String.format("datacenter Id can't be greater than %d or less than 0",
+                    maxDatacenterId));
         }
         this.workerId = workerId;
         this.datacenterId = datacenterId;
+    }
+
+    public static void main(String[] args) {
+        SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator(1, 1);
+        for (int i = 0; i < 10; i++) {
+            System.out.println(idGenerator.nextId());
+        }
     }
 
     // 生成唯一ID
@@ -61,7 +70,8 @@ public class SnowflakeIdGenerator {
         long timestamp = timeGen();
 
         if (timestamp < lastTimestamp) {
-            throw new RuntimeException(String.format("Clock moved backwards. Refusing to generate id for %d milliseconds", lastTimestamp - timestamp));
+            throw new RuntimeException(String.format("Clock moved backwards. Refusing to generate id for %d " +
+                    "milliseconds", lastTimestamp - timestamp));
         }
 
         if (lastTimestamp == timestamp) {
@@ -93,12 +103,5 @@ public class SnowflakeIdGenerator {
     // 返回当前时间戳
     protected long timeGen() {
         return System.currentTimeMillis();
-    }
-
-    public static void main(String[] args) {
-        SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator(1, 1);
-        for (int i = 0; i < 10; i++) {
-            System.out.println(idGenerator.nextId());
-        }
     }
 }

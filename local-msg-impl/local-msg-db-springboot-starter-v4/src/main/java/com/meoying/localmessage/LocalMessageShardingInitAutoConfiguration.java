@@ -63,8 +63,9 @@ public class LocalMessageShardingInitAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public LocalMessageRepository localMessageRepository(ShardingLocalMessageDaoCustom repository,LocalMessageProperties localMessageProperties) {
-        return new JpaShardingLocalMessageRepository(repository,localMessageProperties);
+    public LocalMessageRepository localMessageRepository(ShardingLocalMessageDaoCustom repository,
+                                                         LocalMessageProperties localMessageProperties) {
+        return new JpaShardingLocalMessageRepository(repository, localMessageProperties);
     }
 
     @Bean
@@ -73,7 +74,7 @@ public class LocalMessageShardingInitAutoConfiguration {
                                                    TransactionHelper transactionHelper,
                                                    MsgSender msgSender,
                                                    TableNameRouter tableNameRouter) {
-        return new ShardingLocalMessageManager(localMessageRepository, transactionHelper, msgSender,tableNameRouter);
+        return new ShardingLocalMessageManager(localMessageRepository, transactionHelper, msgSender, tableNameRouter);
     }
 
     @Bean(name = "taskExecutor")

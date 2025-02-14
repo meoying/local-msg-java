@@ -25,7 +25,7 @@ public class StopFunc {
         if (isDone()) {
             return;
         }
-        if(flag.compareAndSet(false, true)){
+        if (flag.compareAndSet(false, true)) {
             supplier.get();
         }
     }
