@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: local-msg-admin
+  profiles:
+    active: dev
+logging:
+  level:
+    root: INFO
+    com.meoying.localmessage: DEBUG
+
+com:
+  meoying:
+    localmessage:
+      enable: true
+      type: simple
+
